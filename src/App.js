@@ -5,16 +5,36 @@ import { Grid } from '@material-ui/core'
 import Youtube from './api/youtube'
 
 class App extends React.Component {
+    state = {
+        videos: [],
+        selectedVideo: null
+    }
+
+    handleSubmit = async (searchTerm) => {
+        const response = await Youtube.get('search', {
+            params: {
+                part : 'snippet',
+                maxResults: 5,
+                key: process.env.REACT_APP_API_KEY,
+                q: searchTerm
+            }
+        })
+
+        this.setState({ videos: response.data.items, selectedVideo: response.data.items[0] })
+    }
+
     render() {
+        const { selectedVideo } = this.state
+
         return (
-            <Grid justify="center" container spacing={16}>
+            <Grid justify="center" container spacing={10}>
                 <Grid item xs={12}>
-                    <Grid container spacing={16}>
+                    <Grid container spacing={10}>
                         <Grid item xs={12}>
-                            <SearchBar/>
+                            <SearchBar onFormSubmit={this.handleSubmit}/>
                         </Grid>
                         <Grid item xs={8}>
-                            <VideoDetail/>
+                            <VideoDetail video={selectedVideo}/>
                         </Grid>
                         <Grid item xs={4}>
                         </Grid>
